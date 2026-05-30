@@ -3,333 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#2563eb">
-    <title>🏭 ТПА: Калькулятор и Настройки</title>
+    <title>🏭 Калькулятор производства</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
-            --bg: #f4f6f9; --card: #ffffff; --primary: #2563eb; --text: #1f2937;
-            --text-sec: #6b7280; --border: #d1d5db; --input-bg: #fafafa;
-            --shadow: rgba(0,0,0,0.08); --accent: #f59e0b; --success: #10b981;
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --primary: #2563eb;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #d1d5db;
+            --input-bg: #fafafa;
+            --success: #10b981;
+            --shadow: rgba(0,0,0,0.08);
         }
+        
         [data-theme="dark"] {
-            --bg: #111827; --card: #1f2937; --primary: #3b82f6; --text: #f9fafb;
-            --text-sec: #9ca3af; --border: #4b5563; --input-bg: #374151;
-            --shadow: rgba(0,0,0,0.3); --accent: #fbbf24;
+            --bg: #111827;
+            --card: #1f2937;
+            --primary: #3b82f6;
+            --text: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border: #4b5563;
+            --input-bg: #374151;
+            --success: #34d399;
+            --shadow: rgba(0,0,0,0.3);
         }
-        * { box-sizing: border-box; transition: background 0.2s, color 0.2s; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; min-height: 100vh; }
         
-        .container { max-width: 600px; margin: 0 auto; background: var(--card); padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px var(--shadow); min-height: 90vh; }
-
-        /* Header & Tabs */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        h1 { font-size: 1.1rem; margin: 0; }
-        .theme-toggle { background: var(--input-bg); border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 16px; }
-
-        .tabs { display: flex; background: var(--input-bg); padding: 3px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 8px; font-weight: 600; color: var(--text-sec); cursor: pointer; font-size: 0.9rem; }
-        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-        .view { display: none; }
-        .view.active { display: block; }
-
-        /* Common Form Elements */
-        label { display: block; margin-top: 10px; font-weight: 600; font-size: 0.85rem; color: var(--text-sec); }
-        input, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: var(--input-bg); color: var(--text); }
-        input:focus { border-color: var(--primary); outline: none; }
-        .row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-end; }
-        .row label { margin-top: 0; }
-
-        /* CALCULATOR STYLES */
-        .calc-res { margin-top: 15px; padding: 12px; background: var(--input-bg); border-radius: 10px; border-left: 4px solid var(--primary); display: none; }
-        .calc-res.show { display: block; }
-        .graph { display: flex; align-items: flex-end; height: 60px; gap: 2px; margin-top: 10px; border-bottom: 1px solid var(--border); }
-        .bar { flex: 1; background: var(--primary); opacity: 0.7; border-radius: 2px 2px 0 0; }
-        .hist-item { font-size: 0.8rem; padding: 6px 0; border-bottom: 1px solid var(--border); color: var(--text-sec); }
-
-        /* TPA SETTINGS STYLES */        .tpa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
-        .tpa-btn { padding: 8px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; font-weight: bold; font-size: 0.8rem; cursor: pointer; color: var(--text-sec); }
-        .tpa-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        .section { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
-        .sec-head { background: var(--input-bg); padding: 8px 10px; font-weight: bold; font-size: 0.9rem; display: flex; justify-content: space-between; }
-        .sec-body { padding: 10px; }
+        * { transition: background-color 0.3s, color 0.1s; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+            min-height: 100vh; 
+            box-sizing: border-box; 
+        }
+        .container { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            background: var(--card); 
+            padding: 20px;             border-radius: 16px; 
+            box-shadow: 0 4px 12px var(--shadow); 
+        }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        th { text-align: left; font-size: 0.7rem; color: var(--text-sec); padding-bottom: 4px; }
-        td { padding: 3px 0; }
-        td input { padding: 6px; font-size: 12px; margin: 0; }
-
-        .save-btn { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        /* Header with theme toggle */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        h1 { 
+            font-size: 1.5rem; 
+            margin: 0; 
+        }
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .theme-toggle:active { transform: scale(0.9); }
+        
+        /* Form elements */
+        label { 
+            display: block; 
+            margin-top: 14px; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: var(--text);
+        }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 6px; 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            font-size: 16px; 
+            box-sizing: border-box;
+            background: var(--input-bg);
+            color: var(--text);
+        }
+        input:focus, select:focus {             outline: none; 
+            border-color: var(--primary); 
+        }
+        .row { 
+            display: flex; 
+            gap: 10px; 
+        }
+        .row input { flex: 2; }
+        .row select { flex: 1; }
+        
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            margin-top: 20px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+        }
+        button:active { transform: scale(0.98); }
+        
+        /* Results */
+        .result { 
+            margin-top: 20px; 
+            padding: 16px; 
+            background: var(--input-bg); 
+            border-radius: 12px; 
+            line-height: 1.6; 
+            font-size: 0.95rem; 
+            border-left: 4px solid var(--primary); 
+        }
+        .error { 
+            background: #fef2f2; 
+            border-left-color: #ef4444; 
+            color: #b91c1c; 
+        }
+        [data-theme="dark"] .error {
+            background: #450a0a;
+            color: #fca5a5;
+        }
+        
+        /* Graph */
+        .graph-container {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--input-bg);
+            border-radius: 12px;            display: none;
+        }
+        .graph-container.show { display: block; }
+        .graph-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        .graph {
+            display: flex;
+            align-items: flex-end;
+            height: 120px;
+            gap: 4px;
+            padding: 10px 0;
+        }
+        .bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            position: relative;
+            opacity: 0.8;
+        }
+        .bar:hover { opacity: 1; }
+        .bar-label {
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        /* History */
+        .history-container {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--input-bg);
+            border-radius: 12px;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .history-title {
+            font-weight: 600;
+            font-size: 1rem;        }
+        .clear-history {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+        }
+        .history-item {
+            padding: 12px;
+            background: var(--card);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--primary);
+            font-size: 0.9rem;
+        }
+        .history-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+        }
+        .no-history {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="header">
-        <h1>🏭 Помощник Литья</h1>
-        <button class="theme-toggle" onclick="toggleTheme()"></button>
-    </div>
-
-    <!-- Переключатель вкладок -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('calc')"> Калькулятор</button>
-        <button class="tab-btn" onclick="switchTab('tpa')">⚙️ Настройки ТПА</button>
-    </div>
-
-    <!-- ====== ВКЛАДКА 1: КАЛЬКУЛЯТОР ====== -->
-    <div id="view-calc" class="view active">
-        <div class="tabs" style="margin-bottom: 10px; border:none; background:transparent; padding:0;">
-            <button class="tab-btn active" id="btn-rate" onclick="setMode('rate')">Сколько сделаем?</button>
-            <button class="tab-btn" id="btn-order" onclick="setMode('order')">До конца заказа</button>
-        </div>
-
-        <label>Время цикла (сек):</label>
-        <input type="number" id="c-cycle" placeholder="30">
-
-        <div class="row">
-            <div style="flex:1">
-                <label>Литник (шт):</label>
-                <input type="number" id="c-shot" placeholder="4">
-            </div>
-            <div style="flex:1">
-                <label>Коробка (шт):</label>
-                <input type="number" id="c-box" placeholder="100">
-            </div>
-        </div>
-        <div id="mode-rate-inputs">
-            <label>Время работы:</label>
-            <div class="row">
-                <input type="number" id="c-period" placeholder="8">
-                <select id="c-unit"><option value="shift">Смен (8ч)</option><option value="hour">Часов</option></select>
-            </div>
-        </div>
-
-        <div id="mode-order-inputs" style="display:none">
-            <label>Заказ всего (шт):</label>
-            <input type="number" id="c-total" placeholder="5000">
-        </div>
-
-        <button class="save-btn" style="background:var(--primary); margin-top:15px" onclick="calc()">🧮 Рассчитать</button>
-
-        <div class="calc-res" id="c-res">
-            <div id="c-res-text"></div>
-            <div class="graph" id="c-graph"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 Производство</h1>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Сменить тему">🌙</button>
         </div>
         
-        <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
-            <div style="font-weight:bold; font-size:0.9rem;">История:</div>
-            <div id="c-hist"></div>
-        </div>
-    </div>
+        <label>⏱ Время цикла (секунд):</label>
+        <input type="number" id="cycle" placeholder="30" step="1">
 
-    <!-- ====== ВКЛАДКА 2: НАСТРОЙКИ ТПА ====== -->
-    <div id="view-tpa" class="view">
-        <div class="tpa-grid" id="tpaGrid"></div>
+        <label>🔗 Деталей на литнике:</label>
+        <input type="number" id="perShot" placeholder="4">
+
+        <label>📦 Деталей в коробке:</label>
+        <input type="number" id="perBox" placeholder="100">
+
+        <label>⏲ Период работы:</label>
+        <div class="row">            <input type="number" id="period" placeholder="Число">
+            <select id="unit">
+                <option value="min">минут</option>
+                <option value="hour">часов</option>
+            </select>
+        </div>
+
+        <button onclick="calculate()">🧮 Рассчитать</button>
         
-        <div class="row">
-            <label>Пресс-форма №:</label>
-            <input type="text" id="t-mold" placeholder="Напр: 245-A">
+        <div class="result" id="output">Введите данные и нажмите кнопку</div>
+        
+        <div class="graph-container" id="graphContainer">
+            <div class="graph-title">📊 Производство по часам</div>
+            <div class="graph" id="graph"></div>
         </div>
-
-        <!-- Температура -->
-        <div class="section">
-            <div class="sec-head">🌡️ Температура (°C)</div>
-            <div class="sec-body">
-                <div class="row">
-                    <label>Зон:</label>
-                    <input type="number" id="t-tempZ" value="4" style="width:50px" onchange="renderT()">
-                </div>
-                <div id="t-tempList"></div>
+        
+        <div class="history-container">
+            <div class="history-header">
+                <div class="history-title">📜 История расчётов</div>
+                <button class="clear-history" onclick="clearHistory()">Очистить</button>
+            </div>
+            <div id="historyList">
+                <div class="no-history">История пуста</div>
             </div>
         </div>
-
-        <!-- Впрыск -->
-        <div class="section">            <div class="sec-head">💉 Впрыск</div>
-            <div class="sec-body">
-                <div class="row">
-                    <label>Шагов:</label>
-                    <input type="number" id="t-injZ" value="3" style="width:50px" onchange="renderI()">
-                </div>
-                <table>
-                    <tr><th>№</th><th>Бар</th><th>%</th><th>мм</th></tr>
-                    <tbody id="t-injList"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Подпитка -->
-        <div class="section">
-            <div class="sec-head">🔋 Подпитка</div>
-            <div class="sec-body">
-                <div class="row">
-                    <label>Шагов:</label>
-                    <input type="number" id="t-holdZ" value="2" style="width:50px" onchange="renderH()">
-                </div>
-                <table>
-                    <tr><th>№</th><th>Бар</th><th>%</th><th>Сек</th></tr>
-                    <tbody id="t-holdList"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <button class="save-btn" onclick="saveTPA()">💾 Сохранить в ТПА <span id="t-num-display">1</span></button>
     </div>
 
-</div>
-
-<script>
-    // --- ОБЩИЕ ФУНКЦИИ ---
-    function toggleTheme() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        localStorage.setItem('theme', isDark ? 'light' : 'dark');
-    }
-
-    function switchTab(tab) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`view-${tab}`).classList.add('active');
-        event.target.classList.add('active');
-        if(tab === 'calc') loadCalcHist();
-    }
-
-    // --- КАЛЬКУЛЯТОР ---    let mode = 'rate';
-    function setMode(m) {
-        mode = m;
-        document.getElementById('btn-rate').classList.toggle('active', m==='rate');
-        document.getElementById('btn-order').classList.toggle('active', m==='order');
-        document.getElementById('mode-rate-inputs').style.display = m==='rate'?'block':'none';
-        document.getElementById('mode-order-inputs').style.display = m==='order'?'block':'none';
-        document.getElementById('c-res').classList.remove('show');
-    }
-
-    function calc() {
-        const cyc = parseFloat(document.getElementById('c-cycle').value);
-        const shot = parseInt(document.getElementById('c-shot').value);
-        const box = parseInt(document.getElementById('c-box').value);
-        const res = document.getElementById('c-res');
-        const txt = document.getElementById('c-res-text');
-
-        if(!cyc || !shot) { alert('Введите цикл и литник!'); return; }
-
-        res.classList.add('show');
-        document.getElementById('c-graph').innerHTML = '';
-
-        if(mode === 'rate') {
-            const per = parseFloat(document.getElementById('c-period').value);
-            const unit = document.getElementById('c-unit').value;
-            const mins = unit==='shift' ? per*8*60 : per*60;
-            const parts = Math.floor((mins*60/cyc) * shot);
-            const boxes = Math.floor(parts/box);
-            txt.innerHTML = `<b>За ${per} ${unit==='shift'?'смен':'ч'}:</b><br> ${parts} шт (${boxes} кор.)`;
-            addHist(`Сделали: ${parts} шт`);
+    <script>
+        // Theme management
+        function initTheme() {
+            const saved = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            updateThemeIcon(saved);
+        }
+        
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+        
+        function updateThemeIcon(theme) {
+            const btn = document.querySelector('.theme-toggle');
+            btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // History management
+        function loadHistory() {            return JSON.parse(localStorage.getItem('calcHistory') || '[]');
+        }
+        
+        function saveHistory(data) {
+            let history = loadHistory();
+            history.unshift({
+                ...data,
+                timestamp: new Date().toISOString()
+            });
+            if (history.length > 10) history = history.slice(0, 10);
+            localStorage.setItem('calcHistory', JSON.stringify(history));
+            renderHistory();
+        }
+        
+        function clearHistory() {
+            localStorage.removeItem('calcHistory');
+            renderHistory();
+        }
+        
+        function renderHistory() {
+            const history = loadHistory();
+            const container = document.getElementById('historyList');
             
-            // График
-            const bars = document.getElementById('c-graph');
-            for(let i=0; i<Math.min(per, 10); i++) {
-                const h = Math.random() * 100; // Заглушка для визуала
-                bars.innerHTML += `<div class="bar" style="height:${h}%"></div>`;
+            if (history.length === 0) {
+                container.innerHTML = '<div class="no-history">История пуста</div>';
+                return;
+            }
+            
+            container.innerHTML = history.map(item => {
+                const date = new Date(item.timestamp);
+                const timeStr = date.toLocaleString('ru-RU', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-time">🕐 ${timeStr}</div>
+                        <div>⏱ ${item.cycle}с | 🔗 ${item.perShot} | 📦 ${item.perBox}</div>
+                        <div>📊 ${item.totalParts} шт. (${item.fullBoxes} кор.)</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Graph
+        function drawGraph(cycle, perShot, totalMinutes) {
+            const container = document.getElementById('graphContainer');            const graph = document.getElementById('graph');
+            container.classList.add('show');
+            
+            const hours = Math.ceil(totalMinutes / 60);
+            const partsPerHour = (3600 / cycle) * perShot;
+            
+            let html = '';
+            for (let i = 1; i <= hours; i++) {
+                const hourParts = Math.round(partsPerHour * (i === hours ? (totalMinutes % 60) / 60 : 1));
+                const maxBar = partsPerHour * hours;
+                const height = Math.max(4, (hourParts / maxBar) * 100);
+                
+                html += `
+                    <div class="bar" style="height: ${height}%" title="Час ${i}: ${hourParts} шт.">
+                        <span class="bar-label">${i}ч</span>
+                    </div>
+                `;
+            }
+            
+            graph.innerHTML = html;
+        }
+        
+        // Calculate
+        function calculate() {
+            const cycle = parseFloat(document.getElementById('cycle').value);
+            const perShot = parseInt(document.getElementById('perShot').value);
+            const perBox = parseInt(document.getElementById('perBox').value);
+            const period = parseFloat(document.getElementById('period').value);
+            const unit = document.getElementById('unit').value;
+            const out = document.getElementById('output');
+
+            if (!cycle || !perShot || !perBox || !period || cycle <= 0 || perShot <= 0 || perBox <= 0 || period <= 0) {
+                out.className = 'result error';
+                out.innerHTML = '⚠️ Заполните все поля положительными числами!';
+                document.getElementById('graphContainer').classList.remove('show');
+                return;
             }
 
-        } else {
-            const tot = parseInt(document.getElementById('c-total').value);
-            if(!tot) return;
-            const secs = (tot/shot) * cyc;
-            const hrs = Math.floor(secs/3600);
-            const min = Math.floor((secs%3600)/60);
-            txt.innerHTML = `<b>Заказ ${tot} шт:</b><br>⏱ Нужно: ${hrs}ч ${min}м`;
-            addHist(`Заказ: ${hrs}ч ${min}м`);
+            const totalMinutes = unit === 'hour' ? period * 60 : period;
+            const totalSeconds = totalMinutes * 60;
+            const totalCycles = totalSeconds / cycle;
+            const totalParts = totalCycles * perShot;
+            const fullBoxes = Math.floor(totalParts / perBox);
+            const remaining = Math.round(totalParts % perBox);
+
+            out.className = 'result';
+            out.innerHTML = `
+                📊 <b>Результат за ${period} ${unit === 'hour' ? 'час(ов)' : 'минут'}:</b><br><br>
+                🔹 Циклов: <b>${totalCycles.toFixed(0)}</b><br>
+                🔹 Деталей: <b>${Math.round(totalParts)} шт.</b><br>                🔹 Полных коробок: <b>${fullBoxes} шт.</b><br>
+                🔹 В последней: <b>${remaining} шт.</b>
+            `;
+            
+            // Save to history
+            saveHistory({
+                cycle,
+                perShot,
+                perBox,
+                period,
+                unit,
+                totalParts: Math.round(totalParts),
+                fullBoxes
+            });
+            
+            // Draw graph
+            drawGraph(cycle, perShot, totalMinutes);
         }
-    }
-
-    function addHist(msg) {        let h = JSON.parse(localStorage.getItem('calcH') || '[]');
-        h.unshift({t: new Date().toLocaleTimeString().slice(0,5), m: msg});
-        if(h.length>5) h.pop();
-        localStorage.setItem('calcH', JSON.stringify(h));
-        loadCalcHist();
-    }
-
-    function loadCalcHist() {
-        const h = JSON.parse(localStorage.getItem('calcH') || '[]');
-        document.getElementById('c-hist').innerHTML = h.map(i => `<div class="hist-item">${i.t}: ${i.m}</div>`).join('');
-    }
-
-    // --- НАСТРОЙКИ ТПА ---
-    let curTPA = 1;
-    
-    function initTPA() {
-        const grid = document.getElementById('tpaGrid');
-        for(let i=1; i<=14; i++) {
-            let b = document.createElement('div');
-            b.className = `tpa-btn ${i===1?'active':''}`;
-            b.textContent = `ТПА ${i}`;
-            b.onclick = () => {
-                document.querySelectorAll('.tpa-btn').forEach(x=>x.classList.remove('active'));
-                b.classList.add('active');
-                curTPA = i;
-                document.getElementById('t-num-display').textContent = i;
-                loadTPA(i);
-            };
-            grid.appendChild(b);
-        }
-        loadTPA(1);
-    }
-
-    function loadTPA(n) {
-        const d = JSON.parse(localStorage.getItem(`tpa_${n}`)) || {};
-        document.getElementById('t-mold').value = d.mold || '';
-        document.getElementById('t-tempZ').value = d.tz || 4;
-        document.getElementById('t-injZ').value = d.iz || 3;
-        document.getElementById('t-holdZ').value = d.hz || 2;
-        renderT(d.tt||[]); renderI(d.it||[]); renderH(d.ht||[]);
-    }
-
-    function saveTPA() {
-        const n = curTPA;
-        const mold = document.getElementById('t-mold').value;
-        const tz = document.getElementById('t-tempZ').value;
-        const iz = document.getElementById('t-injZ').value;
-        const hz = document.getElementById('t-holdZ').value;
-
-        // Сбор данных        const tt = Array.from(document.querySelectorAll('.tt-in')).map(i=>i.value);
-        const it = []; for(let i=0;i<iz;i++) it.push({p:document.querySelector(`.ip${i}`).value, v:document.querySelector(`.iv${i}`).value, m:document.querySelector(`.im${i}`).value});
-        const ht = []; for(let i=0;i<hz;i++) ht.push({p:document.querySelector(`.hp${i}`).value, v:document.querySelector(`.hv${i}`).value, t:document.querySelector(`.ht${i}`).value});
-
-        localStorage.setItem(`tpa_${n}`, JSON.stringify({mold, tz, iz, hz, tt, it, ht}));
-        const btn = document.querySelector('.save-btn');
-        const old = btn.textContent;
-        btn.textContent = '✅ Сохранено!';
-        setTimeout(()=>btn.textContent=old, 1500);
-    }
-
-    function renderT(vals=[]) {
-        const c = parseInt(document.getElementById('t-tempZ').value);
-        const box = document.getElementById('t-tempList');
-        box.innerHTML = '';
-        for(let i=0; i<c; i++) box.innerHTML += `<div class="row"><label>Зона ${i+1}</label><input class="tt-in" type="number" value="${vals[i]||''}"></div>`;
-    }
-    function renderI(vals=[]) {
-        const c = parseInt(document.getElementById('t-injZ').value);
-        const box = document.getElementById('t-injList');
-        box.innerHTML = '';
-        for(let i=0; i<c; i++) {
-            const v = vals[i]||{};
-            box.innerHTML += `<tr><td>${i+1}</td><td><input class="ip${i}" value="${v.p||''}"></td><td><input class="iv${i}" value="${v.v||''}"></td><td><input class="im${i}" value="${v.m||''}"></td></tr>`;
-        }
-    }
-    function renderH(vals=[]) {
-        const c = parseInt(document.getElementById('t-holdZ').value);
-        const box = document.getElementById('t-holdList');
-        box.innerHTML = '';
-        for(let i=0; i<c; i++) {
-            const v = vals[i]||{};
-            box.innerHTML += `<tr><td>${i+1}</td><td><input class="hp${i}" value="${v.p||''}"></td><td><input class="hv${i}" value="${v.v||''}"></td><td><input class="ht${i}" value="${v.t||''}"></td></tr>`;
-        }
-    }
-
-    // Запуск
-    initTPA(); loadCalcHist();
-</script>
+        
+        // Initialize
+        initTheme();
+        renderHistory();
+    </script>
 </body>
 </html>
