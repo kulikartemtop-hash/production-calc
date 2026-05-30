@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2563eb">
+    <title>🏭 Калькулятор производства</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        :root { --bg: #f4f6f9; --card: #ffffff; --primary: #2563eb; --text: #1f2937; }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #111827; --card: #1f2937; --primary: #3b82f6; --text: #f9fafb; }
+            input, select { background: #374151; border-color: #4b5563; color: #fff; }
+            .result { background: #1e3a8a; border-left-color: #60a5fa; }
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; min-height: 100vh; box-sizing: border-box; }
+        .container { max-width: 420px; margin: 0 auto; background: var(--card); padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { text-align: center; font-size: 1.6rem; margin: 0 0 20px; }
+        label { display: block; margin-top: 16px; font-weight: 600; font-size: 0.95rem; }
+        input, select { width: 100%; padding: 12px; margin-top: 6px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        .row { display: flex; gap: 10px; }
+        .row input { flex: 2; }
+        .row select { flex: 1; }
+        button { width: 100%; padding: 14px; margin-top: 24px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        button:active { transform: scale(0.98); }
+        .result { margin-top: 24px; padding: 16px; background: #eff6ff; border-radius: 12px; line-height: 1.6; font-size: 0.95rem; border-left: 4px solid var(--primary); }
+        .error { background: #fef2f2; border-left-color: #ef4444; color: #b91c1c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏭 Калькулятор производства</h1>
+        
+        <label> Время цикла (мин):</label>
+        <input type="number" id="cycle" placeholder="0.5" step="0.01">
+
+        <label>🔗 Деталей на литнике:</label>
+        <input type="number" id="perShot" placeholder="4">
+
+        <label>📦 Деталей в коробке:</label>
+        <input type="number" id="perBox" placeholder="100">
+
+        <label>⏲ Период работы:</label>
+        <div class="row">
+            <input type="number" id="period" placeholder="Число">
+            <select id="unit">
+                <option value="min">минут</option>
+                <option value="hour">часов</option>
+            </select>
+        </div>
+
+        <button onclick="calculate()">🧮 Рассчитать</button>
+        <div class="result" id="output">Введите данные и нажмите кнопку</div>
+    </div>
+
+    <script>
+        function calculate() {
+            const cycle = parseFloat(document.getElementById('cycle').value);
+            const perShot = parseInt(document.getElementById('perShot').value);
+            const perBox = parseInt(document.getElementById('perBox').value);
+            const period = parseFloat(document.getElementById('period').value);
+            const unit = document.getElementById('unit').value;
+            const out = document.getElementById('output');
+
+            if (!cycle || !perShot || !perBox || !period || cycle <= 0 || perShot <= 0 || perBox <= 0 || period <= 0) {
+                out.className = 'result error';
+                out.innerHTML = '⚠️ Заполните все поля положительными числами!';
+                return;
+            }
+
+            const totalMinutes = unit === 'hour' ? period * 60 : period;
+            const totalCycles = totalMinutes / cycle;
+            const totalParts = totalCycles * perShot;
+            const fullBoxes = Math.floor(totalParts / perBox);
+            const remaining = Math.round(totalParts % perBox);
+
+            out.className = 'result';
+            out.innerHTML = `
+                📊 <b>Результат за ${period} ${unit === 'hour' ? 'час(ов)' : 'минут'}:</b><br><br>
+                 Циклов: <b>${totalCycles.toFixed(1)}</b><br>
+                🔹 Деталей: <b>${Math.round(totalParts)} шт.</b><br>
+                🔹 Полных коробок: <b>${fullBoxes} шт.</b><br>
+                🔹 В последней: <b>${remaining} шт.</b>
+            `;
+        }
+    </script>
+</body>
+</html>
